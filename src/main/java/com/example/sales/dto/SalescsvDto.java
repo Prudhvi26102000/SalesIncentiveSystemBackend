@@ -18,5 +18,7 @@ public class SalescsvDto {
 	private Date date;
 	private int vehicleId;
 	private int salesperson_id;
+	private String type;
+	private String name;
 
 }

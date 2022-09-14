@@ -67,6 +67,11 @@ public class CSVHelper {
 
                 salesLineItemDto.setCost(Long.parseLong(csvRecord.get("cost")));
                 System.out.println("in line 64");
+                
+                salesLineItemDto.setType(csvRecord.get("type"));
+                System.out.println("in line 65");
+                
+                salesLineItemDto.setName(csvRecord.get("vehiclename"));
 
                salesLineItemDtoList.add(salesLineItemDto);
                

@@ -23,10 +23,10 @@ public class Vehicle {
 	private String name;
 	private Long cost;
 	
-    @JsonBackReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "vehicleId")
-    @JsonIgnore
-	private List<Commission> commission; 
+//    @JsonBackReference
+//    @OneToMany(cascade = CascadeType.ALL,mappedBy = "vehicleId")
+//    @JsonIgnore
+//	private List<Commission> commission; 
     
     @JsonBackReference
     @OneToMany(cascade=CascadeType.ALL,mappedBy="vehicleId")

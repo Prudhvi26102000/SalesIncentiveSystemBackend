@@ -6,8 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+
 
 @Entity
 public class Commission {
@@ -18,22 +17,21 @@ public class Commission {
 	private Long min_range;
 	private Long max_range;
 	private int percentage;
+	private String type;
 	
-	@ManyToOne
-	@JoinColumn(name="vehicleId",nullable=false)
-	private Vehicle vehicleId;
+
 	
 	public Commission() {
 		
 	}
 
-	public Commission(int id, Long min_range, Long max_range, int percentage, Vehicle vehicleId) {
+	public Commission(int id, Long min_range, Long max_range, int percentage) {
 		super();
 		this.id = id;
 		this.min_range = min_range;
 		this.max_range = max_range;
 		this.percentage = percentage;
-		this.vehicleId = vehicleId;
+
 	}
 
 	public int getId() {
@@ -68,14 +66,16 @@ public class Commission {
 		this.percentage = percentage;
 	}
 
-	public Vehicle getVehicleId() {
-		return vehicleId;
+
+	public String getType() {
+		return type;
 	}
 
-	public void setVehicleId(Vehicle vehicleId) {
-		this.vehicleId = vehicleId;
+	public void setType(String type) {
+		this.type = type;
 	}
 	
+
 	
 	
 	

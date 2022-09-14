@@ -29,6 +29,12 @@ public class Sales_csv {
 	@Column(name="date")
 	private Date date;
 	
+	@Column(name="type")
+	private String type;
+	
+	@Column(name="vehiclename")
+	private String name;
+	
 	@ManyToOne
 	@JoinColumn(name="vehicleId",nullable=false)
 	private Vehicle vehicleId;
@@ -38,6 +44,7 @@ public class Sales_csv {
 	@JsonManagedReference
 	@JoinColumn(name="salesperson_id",nullable=false)
 	private SalesPerson salesperson_id;
+	
 	
 	
 //	public Sales_csv() {

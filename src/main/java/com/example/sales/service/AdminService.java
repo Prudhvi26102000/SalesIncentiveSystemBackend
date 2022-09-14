@@ -5,6 +5,7 @@ package com.example.sales.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.sales.CSVHelper;
 import com.example.sales.Repo.AdminRepo;
+import com.example.sales.Repo.CommissionRepo;
 import com.example.sales.Repo.QuotaRepo;
+import com.example.sales.Repo.SalesPersonRepo;
+//import com.example.sales.Repo.SalesPersonRepo;
 import com.example.sales.Repo.Sales_csvRepo;
 import com.example.sales.Repo.VehicleRepo;
 import com.example.sales.dto.SalescsvDto;
 import com.example.sales.model.Admin;
+import com.example.sales.model.Commission;
 import com.example.sales.model.Quota;
+import com.example.sales.model.SalesPerson;
 import com.example.sales.model.Sales_csv;
 import com.example.sales.model.Vehicle;
 
@@ -47,6 +53,17 @@ public class AdminService {
 	@Autowired
 	private Sales_csvRepo salesrepo;
 	
+	@Autowired
+	private SalesPersonRepo sprepo;
+	
+	@Autowired
+	private CommissionRepo commissionrepo;
+	
+
+	
+
+
+	
 	public Boolean Login(Admin admin)
 	{
 		List<Admin> admins=adminrepo.findAll();
@@ -69,26 +86,7 @@ public class AdminService {
 		return false;
 	}
 	
-//	public Boolean Login(Admin admin) {
-//
-//		if(!adminrepo.existsById(admin.getEmail()))
-//		{
-//			return false;
-//		}
-//		
-//        if(adminrepo.existsById(admin.getEmail())) {
-//            return true;
-//        }
-//
-//        if(admin.getPassword().equals(adminrepo.findByEmail(admin.getEmail()).get().getPassword())) {
-//            adminrepo.save(admin);
-//            return true;
-//        } 
-//        else
-//        {
-//            return false;
-//        }
-//    }
+
 	
 	
 	public Boolean Logout(String email)
@@ -115,6 +113,7 @@ public class AdminService {
 	{
 		return vehiclerepo.save(vehicle);
 	}
+	
 
 		
 	public void save(MultipartFile file) {
@@ -132,9 +131,69 @@ public class AdminService {
                 salesLineItem.setVehicleId(vehicleservice.findByVehicleId(item.getVehicleId()));
                 salesLineItem.setDate(item.getDate());
                 salesLineItem.setCost(item.getCost());
+                salesLineItem.setType(item.getType());
+                salesLineItem.setName(item.getName());
                 salesLineItems.add(salesLineItem);
+                
+               // ChangeCommissionValue(item);
+        		System.out.println("Entered Commission class");
+        		String type=item.getType();
+        		Long cost=item.getCost();
+        		int p=0;
+        		//System.out.println("type:"+type+"Cost:"+cost);
+        		
+        		List<Commission> com=commissionrepo.findAll();
+        		for(Commission c:com)
+        		{
+        			//System.out.println("minrange:"+c.getMin_range()+"cost:"+cost);
+        			if(type.equals(c.getType()))
+        			{
+        				if(cost>=c.getMin_range() && cost<=c.getMax_range())
+        				{
+        					p=c.getPercentage();
+        				}
+        			}
+        		}
+        		System.out.println("percentage:"+p);
+        		long ans=(p*cost)/100;
+        		SalesPerson sp=sprepo.findById(item.getSalesperson_id());
+        		long newCom=sp.getCommission_value()+ans;
+        		System.out.println("NewCommission:"+newCom);
+        		
+        		double l1=1/10;
+        		double l2=1/20;
+        		double l3=1/50;
+        		
+        		long lval1=500000;
+        		long lval2=1000000;
+        		long lval3=1500000;
+        		
+        		if(sp.getCommission_value()>=lval1)
+        		{
+        			long SuperCom1=sp.getCommission_value()+(long)(l1*ans);
+        			sp.setCommission_value(SuperCom1);
+        		}
+        		else if(sp.getCommission_value()>=lval2)
+        		{
+        			long SuperCom2=sp.getCommission_value()+(long)(l2*ans);
+        			sp.setCommission_value(SuperCom2);
+        		}
+        		else if(sp.getCommission_value()>=lval3)
+        		{
+        			long SuperCom3=sp.getCommission_value()+(long)(l3*ans);
+        			sp.setCommission_value(SuperCom3);
+        		}
+        		else {
+        			sp.setCommission_value(newCom);
+        		}
+                sp.setMonthly_sales(item.getCost()+sp.getMonthly_sales());
+                    
+                
             }
-            salesrepo.saveAll(salesLineItems);
+			/* System.out.println("SalesLineItems: "+salesLineItems); */
+            salesrepo.saveAll(salesLineItems);   
+            
+
         } catch (IOException e) {
             throw new RuntimeException("fail to store csv data: " + e.getMessage());
         }
@@ -155,40 +214,20 @@ public class AdminService {
 		return quotarepo.save(quota);
 	}
 	
+	public List<Quota> AllQuota()
+	{
+		return quotarepo.findAll();
+	}
 	
-//	 private boolean ChangeCommissionValue(SalesCsv sc) {
-//	        Commission cm=commissionRepo.findByVehicleIdCost(sc.getVehicleId(),sc.getCost());
-//	        int percent=cm.getPercentage();
-//	        long com=(percent*sc.getCost())/100;
-//	        Salesperson sp=salespersonRepo.findById(sc.getSalespersonId()).get();
-//	        long presentVal=sp.getCommission()+com;
-//	        boolean check=true;
-//	        double[] level=new double[3];
-//	        level[0]=(double) 1/10;
-//	        level[1]=(double) 1/20;
-//	        level[2]=(double) 1/50;
-//	        int i=0;
-//	        int id=sc.getSalespersonId();
-//	        while(check & i<=2){
-//	            int superiorId=salespersonRepo.findSuperiorIdBySalespersonId(id);
-//	            if(superiorId==0 ){
-//	                check=false;
-//	                break;
-//	            }
-//	            Salesperson sup=null;
-//	            try {
-//	                sup = salespersonRepo.findById(superiorId).get();
-//	                long sup_com=sup.getCommission() + (long)(level[i]*com);
-//	                salespersonRepo.setCommission(superiorId,sup_com,sup.getMonthlySales());
-//	            }
-//	            catch (NoSuchElementException e) {
-//	                logger.error(e.getMessage());
-//	            }
-//	            i++;
-//	            id=superiorId;
-//	        }
-//	        long monthlySales=sp.getMonthlySales()+ sc.getCost();
-//	        salespersonRepo.setCommission(sc.getSalespersonId(), presentVal, monthlySales);
-//	        return true;
-//	    }
+	public Optional<Quota> findByQuotaId(int id)
+	{
+		return quotarepo.findQuotaById(id);
+	}
+
+	
+
+	
+
+	
+
 }

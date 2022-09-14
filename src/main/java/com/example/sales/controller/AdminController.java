@@ -1,7 +1,7 @@
 package com.example.sales.controller;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,6 +43,7 @@ public class AdminController {
 	
 	@Autowired 
 	private VehicleService vehicleservice;
+	
 	
 	@PostMapping("/login")
 	public Boolean CheckUser(@Validated @RequestBody Admin admin)
@@ -145,5 +146,20 @@ public class AdminController {
 		Quota newQuota=adminservice.addQuota(quota);
 		return new ResponseEntity<>(newQuota,HttpStatus.CREATED);
 	}
+	
+	@GetMapping("/quotaDetails")
+	public ResponseEntity<List<Quota>> findAllQuota(){
+		
+		List<Quota> allDetails=adminservice.AllQuota();
+		return new ResponseEntity<>(allDetails,HttpStatus.OK);
+	}
+	
+	@GetMapping("/findquota/{id}")
+	public ResponseEntity<Optional<Quota>> findQuotabyId(@PathVariable("id") int id)
+	{
+		Optional<Quota> quota=adminservice.findByQuotaId(id);
+		return new ResponseEntity<>(quota,HttpStatus.OK);
+	}
+	
 
 }
